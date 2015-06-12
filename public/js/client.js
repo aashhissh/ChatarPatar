@@ -179,7 +179,7 @@ $(document).ready(function() {
 
 	socket.on("room-list", function(data){
      	if (data.data.length>0){
-     		$("#messages").append("<li class='text-success'>Live Rooms</li>");
+     		$("#messages").append("<li class='text-success'><b>Live Rooms</b></li>");
 	     	for(var i=0; i<data.data.length; i++){
 	     		$('#messages').append("<li>" + data.data[i] + "</li>");	
 	     	}
