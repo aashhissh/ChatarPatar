@@ -22,7 +22,7 @@ body {
 }
 
 .chat{
+	word-wrap: break-word;
 	display:none;
 	margin: 0 auto 100px;
-	overflow:hidden;
 }
