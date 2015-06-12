@@ -1,0 +1,21 @@
+{
+  "name": "ChatarPatar",
+  "version": "1.0.0",
+  "description": "a simple chat application using node.js, express.js and socket.io",
+  "main": "server.js",
+  "dependencies": {
+    "express": "~4.12.4",
+    "socket.io": "~1.3.5"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/aashhissh/ChatarPatar"
+  },
+  "author": "Ashish Rajani",
+  "license": "BSD"
+}
