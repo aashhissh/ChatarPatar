@@ -9,6 +9,10 @@ var leaveRoomConstruct = /^[\/]leave/;
 var deleteRoomConstruct = /^[\/]delete\s.{3,}/;
 var onlineConstruct = /^[\/]online/;
 
+function scrollToBottom(){
+	$("html, body").animate({ scrollTop: $(document).height()-$(window).height() },1000);
+}
+
 function zeroPad(num, size) {
   var s = num + "";
   while (s.length < size)
@@ -30,9 +34,9 @@ function listRooms(){
 function createRoom(roomName){
 	if(currentRoom !== null){
 		if(currentRoom === roomName){
-			$("#messages").append("<li><span> Already a member.</span></li>");			
+			$("#messages").append("<li class='text-warning'><span> Already a member.</span></li>");			
 		} else {
-			$("#messages").append("<li><span> Leave current room and try again.</span></li>");
+			$("#messages").append("<li class='text-warning'><span> Leave current room and try again.</span></li>");
 		}
 	} else {
 		socket.emit("create-room", roomName);
@@ -42,9 +46,9 @@ function createRoom(roomName){
 function joinRoom(roomName){
 	if(currentRoom !== null){
 		if(currentRoom === roomName){
-			$("#messages").append("<li><span> Already a member.</span></li>");			
+			$("#messages").append("<li class='text-warning'><span> Already a member.</span></li>");			
 		} else {
-			$("#messages").append("<li><span> At a time you can be in a single room. Leave current room and try again.</span></li>");
+			$("#messages").append("<li class='text-warning'><span class='text-warning'> At a time you can be in a single room. Leave current room and try again.</span></li>");
 		}
 	} else {
 		currentRoom = roomName;
@@ -56,13 +60,13 @@ function leaveRoom(){
 	if( currentRoom !== null ){
 		socket.emit("leave-room", currentRoom);
 	} else {
-		$("#messages").append("<li><span> To leave a room you should be member of one.</span></li>");
+		$("#messages").append("<li class='text-warning'><span> To leave a room you should be member of one.</span></li>");
 	}
 }
 
 function deleteRoom(roomName){
 	if( currentRoom === null || currentRoom !== roomName){
-		$("#messages").append("<li><span>To delete you should be its current member and admin.</span></li>");	
+		$("#messages").append("<li class='text-warning'><span>To delete you should be its current member and admin.</span></li>");	
 	} else {
 		socket.emit("delete-room", roomName);
 	}
@@ -105,7 +109,7 @@ function sendProcedure(){
     	if(currentRoom !== null || message.match(t)) {
     		socket.emit("send", currentRoom, new Date().getTime(), message);      
     	} else {
-    		$("#messages").append("<li><span> Please join a room to send message.</span></li>");
+    		$("#messages").append("<li class='text-warning'><span> Please join a room to send message.</span></li>");
     	}
     }
 
@@ -123,6 +127,7 @@ $(document).ready(function() {
 
   	$("#loginMessage").hide();
   	$("#chat").hide();
+  	$("#messageForm").hide();
   	$("#username").focus();
 
   	$('#username').on('keydown', function(e){
@@ -164,6 +169,7 @@ $(document).ready(function() {
 		currentRoom = username;
 		$("#login").hide();
 		$("#chat").show();
+		$("#messageForm").show();
 		$("#message").focus();
 	});
 
@@ -173,54 +179,65 @@ $(document).ready(function() {
 
 	socket.on("room-list", function(data){
      	if (data.data.length>0){
+     		$("#messages").append("<li class='text-success'>Live Rooms</li>");
 	     	for(var i=0; i<data.data.length; i++){
 	     		$('#messages').append("<li>" + data.data[i] + "</li>");	
 	     	}
     	} else {
-      		$("#messages").append("<li class=\"list-group-item\">There are no rooms yet.</li>");
+      		$("#messages").append("<li class='text-warning'>There are no rooms yet.</li>");
     	}
+    	scrollToBottom();
 	});
 
 	socket.on("message", function(data){
-		$("#messages").append("<li><span> " + timeFormat(data.on) + " " + data.from + ": " + data.msg +"</span></li>");
+		$("#messages").append("<li class='text-success'><span> " + timeFormat(data.on) + " " + data.from + ": " + data.msg +"</span></li>");
+		scrollToBottom();
 	});
 
 	socket.on("chat-error", function(msg){
-		$("#messages").append("<li><span> "+ msg +" </span></li>");
+		$("#messages").append("<li><span class='text-warning'> "+ msg +" </span></li>");
+		scrollToBottom();
 	});
 
 	socket.on("room-left", function(){
 		$("#messages").append("<li><span> You left "+ currentRoom +". </span></li>");
 		currentRoom = null;
+		scrollToBottom();
 	});
 
 	socket.on("room-left-admin", function(){
 		$("#messages").append("<li><span> You(admin) left "+ currentRoom +". All members were forced to leave.</span></li>");
 		currentRoom = null;
+		scrollToBottom();
 	});
 
 	socket.on("force-leave-room", function(){
-		$("#messages").append("<li><span> "+ currentRoom +" 's admin deleted/left the room. Being a menber you have to leave too.</span></li>");
+		$("#messages").append("<li  class='text-warning'><span> "+ currentRoom +" 's admin deleted/left the room. Being a menber you have to leave too.</span></li>");
 		currentRoom = null;
+		scrollToBottom();
 	});
 
 	socket.on("disconnect", function(){
 	    $("#messages").append("<li><strong><span class='text-warning'>The server is not available</span></strong></li>");
 	    $("#message").attr("disabled", "disabled");
 	    $("#send").attr("disabled", "disabled");
+	    scrollToBottom();
   	});
 
   	socket.on("error-join", function(){
   		currentRoom = null;
-  		$("#messages").append("<li><span> No such room exists. </span></li>");
+  		$("#messages").append("<li class='text-warning'><span> No such room exists. </span></li>");
+  		scrollToBottom();
   	});
 
   	socket.on("success-join", function(){
-  		$("#messages").append("<li><span> Welcome to " + currentRoom + "</span></li>");
+  		$("#messages").append("<li class='text-success'><span> Welcome to " + currentRoom + "</span></li>");
+  		scrollToBottom();
   	});
 
   	socket.on("error-create", function(){
-  		$("#messages").append("<li><span> Room already exists.</span></li>");
+  		$("#messages").append("<li class='text-warning'><span> Room already exists.</span></li>");
+  		scrollToBottom();
   	});
 
   	socket.on("success-create", function(msg){
@@ -228,21 +245,25 @@ $(document).ready(function() {
    	});
 
    	socket.on("private-message", function(data){
-		$("#messages").append("<li><span> " + timeFormat(data.on) + " (private) " + data.from + ": " + data.msg +"</span></li>");
+		$("#messages").append("<li class='text-success'><span> " + timeFormat(data.on) + " (private) " + data.from + ": " + data.msg +"</span></li>");
+		scrollToBottom();
 	});
 
 	socket.on("success-private", function(data){
-		$("#messages").append("<li><span> " + timeFormat(data.on) + " (private) You ->" + data.too + ": " + data.msg +"</span></li>");
+		$("#messages").append("<li class='text-success'><span> " + timeFormat(data.on) + " (private) You ->" + data.too + ": " + data.msg +"</span></li>");
+		scrollToBottom();
 	});
 
 	socket.on("online-clients", function(data){
      	if (data.length>0){
+     		$('#messages').append("<li class='text-success'><b>Online Clients</b></li>");
 	     	for(var i=0; i<data.length; i++){
 	     		$('#messages').append("<li>" + data[i] + "</li>");	
 	     	}
     	} else {
-      		$("#messages").append("<li class=\"list-group-item\">There are no rooms yet.</li>");
+      		$("#messages").append("<li class='text-warning'>There are no rooms yet.</li>");
     	}
+    	scrollToBottom();
 	});
 
 });

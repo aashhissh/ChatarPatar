@@ -7,21 +7,21 @@
   </head>
   <body>
 
-    <div id="login">
+    <div id="login" class="centered">
       <form id="loginForm">
-        <input type="text" id="username" placeholder="username"/>
-        <input type="submit" id="loginSubmit" value="Login">
+        <input type="text" id="username" class="form-control"placeholder="username"/>
       </form>
       <div id="loginMessage"></div>
     </div>
 
-    <div id="chat">
-      <ul id="messages"></ul>
-      <form id="messageForm">
-        <input type="text" id="message" placeholder="message"/>
-        <input type="submit" id="send" value="Send">
-      </form>
+    <section>
+    <div id="chat" class="chat col-xs-12">
+      <ul id="messages" class="messages"></ul>
     </div>
+    </section>
+    <form id="messageForm" class="bottom col-xs-12">
+      <input type="text" id="message" class="col-xs-12 form-control" placeholder="message"/>
+    </form>
 
     <script src="js/jquery.js"></script>
     <script src="js/bootstrap.js"></script>
